@@ -3,8 +3,9 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include "Reloj.h"
-#include "Planificador1.h"    // Lista enlazada
+
+#include "headers/Reloj.h"
+#include "headers/Planificador1.h"    // Lista enlazada
 //#include "Planificador2.h"    // Cola de prioridad
 //#include "Planificador3.h"    // Monticulo binomial
 
@@ -50,7 +51,7 @@ int main(){
         cargarRelojes(p1, archivo);
         archivo.close();
 
-        p1->run();
+        p1->runito();
     }
     else{
         cout << "El archivo no pudo ser abierto.";
