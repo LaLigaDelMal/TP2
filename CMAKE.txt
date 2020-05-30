@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 3.16)
+project(Segundo_Parcial_AyED)
+
+set(CMAKE_CXX_STANDARD 14)
+
+# Busca todos los archivos dentro de la carpeta include y lios guarda en una variable headers
+# que terminen en .h
+file(GLOB headers
+        "*.h"
+        )
+
+# Busca todos los arhicos cpp en la carpeta raiz y los guarda en una variable sources
+# que terminen en .cpp
+file(GLOB sources
+        "*.cpp"
+        )
+
+# Crea un ejecutable llamado EjemploProyecto con los archivos encontrados guardados en "sources" y "headers"
+add_executable(Segundo_Parcial_AyED ${headers} ${sources})

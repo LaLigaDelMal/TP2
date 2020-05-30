@@ -1,5 +1,5 @@
-#include "Planificador.h"
-#include "Lista.h"
+#include "Planificador.cpp"
+#include "Lista.cpp"
 
 
 #ifndef PLANIFICADOR1_H

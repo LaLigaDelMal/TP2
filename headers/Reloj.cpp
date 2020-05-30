@@ -1,5 +1,6 @@
 #include <string>
-#include "Evento.h"
+#include <ctime>
+#include "Evento.cpp"
 
 #ifndef RELOJ_H
 #define RELOJ_H
@@ -16,8 +17,7 @@ private:
   int generarRnd(int max);
 
 public:
-  Reloj(int numRel, int tieRep, string nomRel, bool al)
-  : numeroDeReloj(numRel), intervaloRep(tieRep), nombreDeReloj(nomRel), aleatorio(al){};
+  Reloj(int numRel, int tieRep, string nomRel, bool al): numeroDeReloj(numRel), intervaloRep(tieRep), nombreDeReloj(nomRel), aleatorio(al){};
   ~Reloj(){};
 
   void generarEventos();

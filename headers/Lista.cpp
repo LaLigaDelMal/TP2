@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <iostream>
-#include "Nodo.h"
+#include "Nodo.cpp"
 
 #ifndef LISTA_H
 #define LISTA_H

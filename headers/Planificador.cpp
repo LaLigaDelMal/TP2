@@ -1,6 +1,6 @@
-#include "Reloj.h"
-#include "Evento.h"
-#include "Lista.h"
+#include "Reloj.cpp"
+#include "Evento.cpp"
+#include "Lista.cpp"
 
 #ifndef PLANIFICADOR_H
 #define PLANIFICADOR_H
