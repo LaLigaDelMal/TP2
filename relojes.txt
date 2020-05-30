@@ -1,0 +1,4 @@
+1 Reloj_1 periodico 5
+2 Reloj_2 aleatorio 3
+3 Reloj_3 periodico 17
+4 Reloj_4 aleatorio 15
