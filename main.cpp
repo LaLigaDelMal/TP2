@@ -219,7 +219,6 @@ void Reloj::generarEventos(){
 }
 
 Evento* Reloj::getEventos(){
-
     return this->eventos[50];
 }
 
