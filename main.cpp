@@ -114,6 +114,76 @@ template <class T> Nodo<T>* Lista<T>::nodo() {
     return czo;
 }
 
+//----------------------------------------------------------
+//ARBOL
+template <class T> class Arbol {
+private:
+    Nodo<T>* raiz, * q;
+    void ArbolBusq(T x, Nodo<T>*& nuevo);
+    void rid(Nodo<T>* aux);
+    void ird(Nodo<T>* aux);
+    void idr(Nodo<T>* aux);
+    void show(Nodo<T>* aux, int n);
+
+public:
+    Arbol() { raiz = NULL; };
+    ~Arbol() {};
+    void CreaArbolBus(T x);
+    void RID() { rid(raiz); }
+    void IRD() { ird(raiz); }
+    void IDR() { idr(raiz); }
+    void VerArbol() { show(raiz, 0); }
+
+};
+
+
+template <class T> void Arbol<T>::CreaArbolBus(T x)
+{
+    ArbolBusq(x, raiz);
+}
+template <class T> void Arbol<T>::ArbolBusq(T x, Nodo<T>*& nuevo)
+{
+    if (nuevo == NULL) {
+        nuevo = new Nodo<T>;
+        nuevo->info = x; nuevo->der = nuevo->izq = NULL;
+    }
+    if (x > nuevo->info) ArbolBusq(x, nuevo->der);
+    if (x < nuevo->info) ArbolBusq(x, nuevo->izq);
+}
+template <class T> void Arbol<T>::ird(Nodo<T>* aux)
+{
+    if (aux != NULL) {
+        ird(aux->izq);
+        cout << "\n" << aux->info;
+        ird(aux->der);
+    }
+}
+template <class T> void Arbol<T>::rid(Nodo<T>* aux)
+{
+    if (aux != NULL) {
+        cout << "\n" << aux->info;
+        rid(aux->izq);
+        rid(aux->der);
+    }
+}
+template <class T> void Arbol<T>::idr(Nodo<T>* aux)
+{
+    if (aux != NULL) {
+        idr(aux->izq);
+        idr(aux->der);
+        cout << "\n" << aux->info;
+    }
+}
+template <class T> void Arbol<T>::show(Nodo<T>* aux, int n)
+{
+    int i;
+    if (aux != NULL) {                      //OjO este es un recorrido dri
+        show(aux->der, n + 1);
+        for (i = 1; i <= n; i++) cout << "     ";
+        cout << aux->info << "\n";
+        show(aux->izq, n + 1);
+    }
+}
 
 
 
@@ -224,6 +294,7 @@ void Planificador::run(){
     cout << ev.horaDeEjecucion << ' ' << ev.nombreDelEvento << endl;
     eventosLanzados++;
     contAux++;
+    //TODO sleep de evento
 
     if(contAux == 500){
 
@@ -292,6 +363,47 @@ Evento Planificador1::getProximoEvento(){
     return  ev;
 }
 
+//-------------------------------------------------------------------------------------------
+//  PLANIFICADOR 1 (lista enlazada)
+
+class Planificador2 : public Planificador{
+
+private:
+    Arbol<Evento>* eventos = new Arbol<Evento>();
+    void ordenar();
+
+public:
+    void agregarReloj(Reloj* r) override ;
+    Evento getProximoEvento() override ;
+
+};
+
+void Planificador2::ordenar(){
+
+}
+
+void Planificador2::agregarReloj(Reloj* r){
+
+    // Se carga el reloj en la lista de relojes del Planificador
+    this->relojes->add(*r);  // Puntero a Reloj desreferenciado
+    // Genera 50 eventos por cada reloj que se agrega
+    r->generarEventos();
+    Evento* ArrDeEventos = r->getEventos();
+
+    for(int c = 0; c < 50; c++){
+        // Guarda los eventos en la lista del planificador donde seran ordenados y luego ejecutados
+        eventos->CreaArbolBus(ArrDeEventos[c]);
+    }
+    //ordenar();
+}
+
+Evento Planificador2::getProximoEvento(){
+
+    Evento ev = eventos->cabeza();
+    eventos->borrar();
+
+    return  ev;
+}
 
 
 
@@ -341,10 +453,11 @@ int main(){
     archivo.open("relojes.txt");
 
     // Inicializar planificadores
-    Planificador1* p1 = new Planificador1();
+    //Planificador1* p1 = new Planificador1();
+    Planificador2* p2 = new Planificador2();
 
     if(archivo.is_open()){
-        cargarRelojes(p1, archivo);
+        cargarRelojes(p2, archivo);
         archivo.close();
 
         p1->run();
