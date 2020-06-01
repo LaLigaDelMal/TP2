@@ -13,10 +13,6 @@ using namespace std;
 
 template <class T> class Nodo
 {
-private:
-    T dato;
-    Nodo* next;
-
 public:
     Nodo();
     Nodo(T a);
@@ -26,6 +22,9 @@ public:
     T get_dato();
     Nodo* get_next();
     bool es_vacio();
+    Nodo* der, * izq;
+    T dato;
+    Nodo* next;
 };
 
 template <class T> Nodo<T>::Nodo(){
@@ -119,49 +118,61 @@ template <class T> Nodo<T>* Lista<T>::nodo() {
 template <class T> class Arbol {
 private:
     Nodo<T>* raiz, * q;
-    void ArbolBusq(T x, Nodo<T>*& nuevo);
+    void arbolBusq(T x, Nodo<T>*& nuevo);
     void rid(Nodo<T>* aux);
     void ird(Nodo<T>* aux);
     void idr(Nodo<T>* aux);
     void show(Nodo<T>* aux, int n);
 
+    void borrar(Nodo<T>*& p, T x);
+    void bor(Nodo<T>*& d);
+    void mh(Nodo<T>* aux);
+    T menor(Nodo<T>* aux);
+    bool esta(Nodo<T>* aux, T x);
+
 public:
     Arbol() { raiz = NULL; };
     ~Arbol() {};
-    void CreaArbolBus(T x);
+    void creaArbolBus(T x);
     void RID() { rid(raiz); }
     void IRD() { ird(raiz); }
     void IDR() { idr(raiz); }
     void VerArbol() { show(raiz, 0); }
 
+    void borrar(T x) { borrar(raiz, x); }
+    void mostrarHojas() { mh(raiz); }
+    T menor() { return menor(raiz); }
+    bool esta(T x) { return esta(raiz, x); }
 };
 
 
-template <class T> void Arbol<T>::CreaArbolBus(T x)
+template <class T> void Arbol<T>::creaArbolBus(T x)
 {
-    ArbolBusq(x, raiz);
+    arbolBusq(x, raiz);
 }
-template <class T> void Arbol<T>::ArbolBusq(T x, Nodo<T>*& nuevo)
+template <class T> void Arbol<T>::arbolBusq(T x, Nodo<T>*& nuevo)
 {
+    std::cout << x.getTiempo() << '\n';
     if (nuevo == NULL) {
         nuevo = new Nodo<T>;
-        nuevo->info = x; nuevo->der = nuevo->izq = NULL;
+        nuevo->dato = x;
+        nuevo->der = nuevo->izq = NULL;
     }
-    if (x > nuevo->info) ArbolBusq(x, nuevo->der);
-    if (x < nuevo->info) ArbolBusq(x, nuevo->izq);
+    if ( x.getTiempo() > nuevo->get_dato().getTiempo() ) arbolBusq(x, nuevo->der);
+    if ( x.getTiempo() < nuevo->get_dato().getTiempo() ) arbolBusq(x, nuevo->izq);
 }
 template <class T> void Arbol<T>::ird(Nodo<T>* aux)
 {
     if (aux != NULL) {
         ird(aux->izq);
-        cout << "\n" << aux->info;
+        cout << "\n" << aux->get_dato();
         ird(aux->der);
     }
 }
 template <class T> void Arbol<T>::rid(Nodo<T>* aux)
 {
     if (aux != NULL) {
-        cout << "\n" << aux->info;
+        cout << "\n" << aux->get_dato();
         rid(aux->izq);
         rid(aux->der);
     }
@@ -171,7 +182,7 @@ template <class T> void Arbol<T>::idr(Nodo<T>* aux)
     if (aux != NULL) {
         idr(aux->izq);
         idr(aux->der);
-        cout << "\n" << aux->info;
+        cout << "\n" << aux->get_dato();
     }
 }
 template <class T> void Arbol<T>::show(Nodo<T>* aux, int n)
@@ -180,11 +191,53 @@ template <class T> void Arbol<T>::show(Nodo<T>* aux, int n)
     if (aux != NULL) {                      //OjO este es un recorrido dri
         show(aux->der, n + 1);
         for (i = 1; i <= n; i++) cout << "     ";
-        cout << aux->info << "\n";
+        cout << aux->get_dato().getTiempo() << "\n";
         show(aux->izq, n + 1);
     }
 }
+template <class T> bool Arbol<T>::esta(Nodo<T>* aux, T x)
+{
+    if (aux == NULL) return false;
+    else if (x.getTiempo() > aux->get_dato().getTiempo() ) return esta(aux->der, x);
+    else if (x.getTiempo() < aux->get_dato().getTiempo() ) return esta(aux->izq, x);
+    return true;
 
+}
+template <class T> void Arbol<T>::mh(Nodo<T>* aux)
+{
+    if (aux != NULL) {
+        mh(aux->izq);
+        if (aux->izq == NULL && aux->der == NULL)cout << "\n" << aux->get_dato().getTiempo();
+        mh(aux->der);
+    }
+}
+template <class T> T Arbol<T>::menor(Nodo<T>* aux)
+{
+    if (aux->izq == NULL)return aux->get_dato();
+    return menor(aux->izq);
+}
+template <class T> void Arbol<T>::borrar(Nodo<T>*& p, T x)
+{
+    if (p == NULL) cout << "\n El dato NO esta\n\n";
+    else if ( x.getTiempo() > p->get_dato().getTiempo() ) borrar(p->der, x);
+    else if ( x.getTiempo() < p->get_dato().getTiempo() ) borrar(p->izq, x);
+    else {// lo encontre en el nodo p
+        q = p;
+        if (q->der == NULL) p = q->izq;// raiz<=raiz del subarbol izq
+        else if (q->izq == NULL) p = q->der;//raiz<=raiz del subarbol der
+        else bor(q->izq);//busca en el sub arbol izq
+        delete q;
+    }
+}
+template <class T> void Arbol<T>::bor(Nodo<T>*& d)
+{
+    if (d->der != NULL) bor(d->der);//busca el elemento mas a la derecha
+    else {
+        q->set_dato( d->get_dato() );
+        q = d;
+        d = d->izq;
+    }
+}
 
 
 
@@ -199,10 +252,13 @@ public:
             : nombreDelEvento(nombre), horaDeEjecucion(tiempo){};   //Constructor con parametros
     string nombreDelEvento;
     unsigned int horaDeEjecucion;
+    int getTiempo();
 
 };
 
-
+int Evento::getTiempo(){
+    return horaDeEjecucion;
+}
 
 
 
@@ -305,11 +361,11 @@ void Planificador::run(){
 
 void Planificador::regenerar(){
 
-    Nodo<Reloj>* nodoReloj = relojes->nodo();
+    Nodo<Reloj>* NodoReloj = relojes->nodo();
     // Vover a generar 50 eventos por reloj cargado en el planificador (lista de relojes)
-    while(!nodoReloj->es_vacio()){
-        nodoReloj->get_dato().generarEventos();
-        nodoReloj = nodoReloj->get_next();
+    while(!NodoReloj->es_vacio()){
+        NodoReloj->get_dato().generarEventos();
+        NodoReloj = NodoReloj->get_next();
     }
 
 }
@@ -392,15 +448,15 @@ void Planificador2::agregarReloj(Reloj* r){
 
     for(int c = 0; c < 50; c++){
         // Guarda los eventos en la lista del planificador donde seran ordenados y luego ejecutados
-        eventos->CreaArbolBus(ArrDeEventos[c]);
+        eventos->creaArbolBus(ArrDeEventos[c]);
     }
     //ordenar();
 }
 
 Evento Planificador2::getProximoEvento(){
 
-    Evento ev = eventos->cabeza();
-    eventos->borrar();
+    Evento ev = eventos->menor();
+    eventos->borrar(ev);
 
     return  ev;
 }
@@ -460,7 +516,7 @@ int main(){
         cargarRelojes(p2, archivo);
         archivo.close();
 
-        p1->run();
+        p2->run();
     }
     else{
         cout << "El archivo no pudo ser abierto.";
