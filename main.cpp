@@ -61,8 +61,6 @@ template <class T> bool Nodo<T>::es_vacio(){
 //  LISTA
 
 template <class T> class Lista{
-private:
-    Nodo<T>* czo;
 
 public:
     Lista();
@@ -72,6 +70,7 @@ public:
     T cabeza();
     void borrar();     // Borra el Nodo cabeza
     Nodo<T>* nodo();
+    Nodo<T>* czo;
 };
 
 template <class T> Lista<T>::Lista(){
@@ -129,32 +128,10 @@ public:
             : nombreDelEvento(nombre), horaDeEjecucion(tiempo){};   //Constructor con parametros
     string nombreDelEvento;
     unsigned int horaDeEjecucion;
-    void setHoraDeEjecucion(unsigned int hora);
-    void setNombreDelEvento(string nombre);
-    unsigned int getHoraDeEjecucion();
-    string getNombreDelEvento();
-
 };
 
-void Evento::setHoraDeEjecucion(unsigned int hora) {
 
-    horaDeEjecucion = hora;
-}
 
-void Evento::setNombreDelEvento(string nombre) {
-
-    nombreDelEvento = nombre;
-}
-
-unsigned int Evento::getHoraDeEjecucion() {
-
-    return horaDeEjecucion;
-}
-
-string Evento::getNombreDelEvento() {
-
-    return nombreDelEvento;
-}
 
 //-------------------------------------------------------------------------------------------
 //  RELOJ
@@ -371,32 +348,44 @@ void Planificador1::swapEventos(int posicionA, int posicionB){
             posicionB = temp;
         }
 
-        Nodo<Evento> *nodoEvento = eventos->nodo();
-        Nodo<Evento> *nodoEventoA;
-        Nodo<Evento> *nodoEventoB;
+    Nodo<Evento> *nodoEvento = eventos->nodo();
 
-        for(int x = 0; x <= posicionA; x++){
+    if(posicionA == posicionB || !nodoEvento || !nodoEvento->get_next())
+        return;
 
-            if(x == posicionA){nodoEventoA = nodoEvento;}
-            if(x == posicionB){nodoEventoB = nodoEvento;}
+    Nodo<Evento> *nodoA = nullptr;
+    Nodo<Evento> *nodoB = nullptr;
+    Nodo<Evento> *previoA = nullptr;
+    Nodo<Evento> *previoB = nullptr;
 
-            nodoEvento = nodoEvento->get_next();
-        }
+    for(int x = 0; x <= posicionA; x++){
 
-   // cout << "Hora evento en A: " << nodoEventoA->get_dato().getHoraDeEjecucion() << " Hora evento en B: " << nodoEventoB->get_dato().getHoraDeEjecucion() << endl;
+        if(x == (posicionA - 1)){previoA = nodoEvento;}
+        if(x == posicionA){nodoA = nodoEvento;}
+        if(x == (posicionB - 1)){previoB = nodoEvento;}
+        if(x == posicionB){nodoB = nodoEvento;}
 
-        string auxNombre;
-        unsigned int auxHora;
+        nodoEvento = nodoEvento->get_next();
+    }
 
-        auxNombre = nodoEventoA->get_dato().getNombreDelEvento();
-        auxHora = nodoEventoA->get_dato().getHoraDeEjecucion();
-        nodoEventoA->get_dato().setNombreDelEvento(nodoEventoB->get_dato().getNombreDelEvento());
-        nodoEventoA->get_dato().setHoraDeEjecucion(nodoEventoB->get_dato().getHoraDeEjecucion());
-        nodoEventoB->get_dato().setNombreDelEvento(auxNombre);
-        nodoEventoB->get_dato().setHoraDeEjecucion(auxHora);
+    if(!nodoA || !nodoB)
+        return;
 
-     //   cout << "Swap de la posicion: " << posicionA << " con la posicion: " << posicionB << endl;
-     //   cout << "Hora evento en A: " << nodoEventoA->get_dato().getHoraDeEjecucion() << " Hora evento en B: " << nodoEventoB->get_dato().getHoraDeEjecucion() << endl;
+    if(previoA){
+        previoA->set_next(nodoB);
+    } else { // nodeA is head
+        eventos->czo = nodoB;
+    }
+
+    if(previoB){
+        previoB->set_next(nodoA);
+    } else { // nodeB is head
+        eventos->czo = nodoA;
+    }
+
+    Nodo<Evento> *tmp = nodoA->get_next();
+    nodoA->set_next(nodoB->get_next());
+    nodoB->set_next(tmp);
 }
 
 
@@ -407,7 +396,7 @@ void Planificador1::agregarEventos(){
 
     while(!nodoReloj->es_vacio()){
 
-        // Arreglo de objetos Evento
+        // Arreglo de punteros a objetos Evento
         Evento** ArrDeEventos = nodoReloj->get_dato()->getEventos();
 
         for(int x = 0; x < 50; x++){
@@ -506,7 +495,7 @@ int main(){
 
 /*
  *     PROBLEMAS:
- *     1) No funciona el swap en el Planificador1.
+ *     1) Imprime un cero entre los primeros 500 eventos.
  *     2) Darle formato al tiempo de los eventos (No es la prioridad en este momento)
  *
  */
