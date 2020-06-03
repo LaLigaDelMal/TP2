@@ -414,7 +414,7 @@ Evento Planificador1::getProximoEvento(){
     Evento ev = eventos->cabeza();
     eventos->borrar();
 
-    return  arrDeEventos[0];
+    return  ev;
 }
 
 //-------------------------------------------------------------------------------------------
@@ -423,52 +423,78 @@ Evento Planificador1::getProximoEvento(){
 class Planificador2 : public Planificador{
 
 private:
+    Lista<Reloj>* relojes = new Lista<Reloj>;
     Evento* eventos[100];
     void ordenar();
-    unsigned int getHoraDelEvento(int posicion);
 
 public:
-    void agregarEventos() override ;
-    Evento getProximoEvento() override ;
+    void agregarReloj(Reloj reloj);
+    //void agregarEventos() override ;
+    //Evento getProximoEvento() override ;
 
 };
 
 
 void Planificador2::ordenar(){
     std::cout << "ordena" << '\n';
-}
+    int N=100;
+    if(N==0) return; // heap esta vacio?
+    int t; // valor temporario
+    unsigned int n = N, parent = N/2, index, child; //indices del heap
+    int m=0;
+    int c=0;
 
-// Devuelve la hora de ejecucion del evento en la posicion especificada de la lista
-unsigned int Planificador2::getHoraDelEvento(int posicion){
-    std::cout << "getHora" << '\n';
-}
-
-void Planificador1::agregarEventos(){
-
-    Nodo<Reloj*>* nodoReloj = relojes->nodo();
-
-    while(!nodoReloj->es_vacio()){
-
-        // Arreglo de punteros a objetos Evento
-        Evento** ArrDeEventos = nodoReloj->get_dato()->getEventos();
-
-        for(int x = 0; x < 50; x++){
-
-            // Guarda los eventos en la lista del planificador donde seran ordenados y luego ejecutados
-            eventos->add(*ArrDeEventos[x]);
+    while (1) { // while hasta que este ordenado
+        if (parent > 0) {
+            // primera etapa - ordenar el heap
+            t = eventos[--parent]->horaDeEjecucion;  // valor temporario
+            m++;
+        } else {
+            // segunda etapa - extraer elementos
+            n--;                // achico el heap
+            if (n == 0) return; // termin�
+            t = eventos[n]->horaDeEjecucion;         // valor temporario
+            eventos[n] = eventos[0];    // valor mas grande>> a su posicion final
+            m=m+2;
         }
-        nodoReloj = nodoReloj->get_next();
-    }
-    ordenar();
+        /* insert operation - pushing t down the heap to replace the parent */
+        // operaci�n de inserci�n
+        index = parent; // inicio con el padre
+        child = index * 2 + 1; // hijo izquierdo
+        printf("\n parent:%3d   child:%3d  t:%3d",parent,child,t);
+        while (child < n) {
+            c++;// busco el hijo mayor
+            if (child + 1 < n  &&  eventos[child + 1] > eventos[child]) {
+                child++; // mayor hijo es el derecho
+            }
+            c++;// el hijo es > temporario
+            if (eventos[child]->horaDeEjecucion > t) {
+                eventos[index] = eventos[child]; // sobreescribo con el hijo
+                m++;
+                index = child; // muevo index
+                child = index * 2 + 1; // recalculo hijo izq
+            } else break; // encontr� el lugar para temporario
+        }// fin while (child<n)
+        eventos[index]->horaDeEjecucion = t; m++;// temporario a su nuevo lugar
+    }// fin while(1)
 }
 
-Evento Planificador1::getProximoEvento(){
 
-    Evento ev = eventos->cabeza();
-    eventos->borrar();
-
-    return  arrDeEventos[0];
+void Planificador2::agregarReloj(Reloj reloj){
+    //Se añade el reloj a la Lista
+    relojes->add(reloj);
+    //TODO Añadir eventos del reloj
+    //Ordenar
+    //ordenar();
 }
+
+//Evento Planificador2::getProximoEvento(){
+
+    //Evento ev = eventos->cabeza();
+    //eventos->borrar();
+
+    //return  eventos[0];
+//}
 
 
 
@@ -517,20 +543,23 @@ int main(){
     archivo.open("relojes.txt");
 
     // Inicializar planificadores
-    Planificador1* p1 = new Planificador1();
+    //Planificador1* p1 = new Planificador1();
+    Planificador2* p2 = new Planificador2();
 
     if(archivo.is_open()){
 
         cout << "**************** Relojes Cargados ******************" << endl;
 
-        cargarRelojes(p1, archivo);
+        //cargarRelojes(p1, archivo);
+        cargarRelojes(p2, archivo);
         archivo.close();
 
         cout << "**************** Eventos Lanzados ******************" << endl;
 
         int c = 0;
         while(c<=2000) {
-            p1->run();
+            //p1->run();
+            p2->run();
             c++;
         }
     }
