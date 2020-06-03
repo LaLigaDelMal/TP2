@@ -476,7 +476,7 @@ void Planificador2::ordenar(){
             } else break; // encontr� el lugar para temporario
         }// fin while (child<n)
         eventos[index]->horaDeEjecucion = t; m++;// temporario a su nuevo lugar
-    }// fin while(1)
+    }
 }
 
 
@@ -496,6 +496,11 @@ void Planificador2::agregarReloj(Reloj reloj){
     //return  eventos[0];
 //}
 
+void Planificador2::run(){
+    for (size_t i = 0; i < count; i++) {
+        /* code */
+    }
+}
 
 
 //-------------------------------------------------------------------------------------------
