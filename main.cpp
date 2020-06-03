@@ -13,6 +13,10 @@ using namespace std;
 
 template <class T> class Nodo
 {
+private:
+    T dato;
+    Nodo* next;
+
 public:
     Nodo();
     Nodo(T a);
@@ -22,9 +26,6 @@ public:
     T get_dato();
     Nodo* get_next();
     bool es_vacio();
-    Nodo* der, * izq;
-    T dato;
-    Nodo* next;
 };
 
 template <class T> Nodo<T>::Nodo(){
@@ -60,8 +61,6 @@ template <class T> bool Nodo<T>::es_vacio(){
 //  LISTA
 
 template <class T> class Lista{
-private:
-    Nodo<T>* czo;
 
 public:
     Lista();
@@ -71,6 +70,7 @@ public:
     T cabeza();
     void borrar();     // Borra el Nodo cabeza
     Nodo<T>* nodo();
+    Nodo<T>* czo;
 };
 
 template <class T> Lista<T>::Lista(){
@@ -113,131 +113,7 @@ template <class T> Nodo<T>* Lista<T>::nodo() {
     return czo;
 }
 
-//----------------------------------------------------------
-//ARBOL
-template <class T> class Arbol {
-private:
-    Nodo<T>* raiz, * q;
-    void arbolBusq(T x, Nodo<T>*& nuevo);
-    void rid(Nodo<T>* aux);
-    void ird(Nodo<T>* aux);
-    void idr(Nodo<T>* aux);
-    void show(Nodo<T>* aux, int n);
 
-    void borrar(Nodo<T>*& p, T x);
-    void bor(Nodo<T>*& d);
-    void mh(Nodo<T>* aux);
-    T menor(Nodo<T>* aux);
-    bool esta(Nodo<T>* aux, T x);
-
-public:
-    Arbol() { raiz = NULL; };
-    ~Arbol() {};
-    void creaArbolBus(T x);
-    void RID() { rid(raiz); }
-    void IRD() { ird(raiz); }
-    void IDR() { idr(raiz); }
-    void VerArbol() { show(raiz, 0); }
-
-    void borrar(T x) { borrar(raiz, x); }
-    void mostrarHojas() { mh(raiz); }
-    T menor() { return menor(raiz); }
-    bool esta(T x) { return esta(raiz, x); }
-};
-
-
-template <class T> void Arbol<T>::creaArbolBus(T x)
-{
-    arbolBusq(x, raiz);
-}
-template <class T> void Arbol<T>::arbolBusq(T x, Nodo<T>*& nuevo)
-{
-    std::cout << x.getTiempo() << '\n';
-    if (nuevo == NULL) {
-        nuevo = new Nodo<T>;
-        nuevo->dato = x;
-        nuevo->der = nuevo->izq = NULL;
-    }
-    if ( x.getTiempo() > nuevo->get_dato().getTiempo() ) arbolBusq(x, nuevo->der);
-    if ( x.getTiempo() < nuevo->get_dato().getTiempo() ) arbolBusq(x, nuevo->izq);
-}
-template <class T> void Arbol<T>::ird(Nodo<T>* aux)
-{
-    if (aux != NULL) {
-        ird(aux->izq);
-        cout << "\n" << aux->get_dato();
-        ird(aux->der);
-    }
-}
-template <class T> void Arbol<T>::rid(Nodo<T>* aux)
-{
-    if (aux != NULL) {
-        cout << "\n" << aux->get_dato();
-        rid(aux->izq);
-        rid(aux->der);
-    }
-}
-template <class T> void Arbol<T>::idr(Nodo<T>* aux)
-{
-    if (aux != NULL) {
-        idr(aux->izq);
-        idr(aux->der);
-        cout << "\n" << aux->get_dato();
-    }
-}
-template <class T> void Arbol<T>::show(Nodo<T>* aux, int n)
-{
-    int i;
-    if (aux != NULL) {                      //OjO este es un recorrido dri
-        show(aux->der, n + 1);
-        for (i = 1; i <= n; i++) cout << "     ";
-        cout << aux->get_dato().getTiempo() << "\n";
-        show(aux->izq, n + 1);
-    }
-}
-template <class T> bool Arbol<T>::esta(Nodo<T>* aux, T x)
-{
-    if (aux == NULL) return false;
-    else if (x.getTiempo() > aux->get_dato().getTiempo() ) return esta(aux->der, x);
-    else if (x.getTiempo() < aux->get_dato().getTiempo() ) return esta(aux->izq, x);
-    return true;
-
-}
-template <class T> void Arbol<T>::mh(Nodo<T>* aux)
-{
-    if (aux != NULL) {
-        mh(aux->izq);
-        if (aux->izq == NULL && aux->der == NULL)cout << "\n" << aux->get_dato().getTiempo();
-        mh(aux->der);
-    }
-}
-template <class T> T Arbol<T>::menor(Nodo<T>* aux)
-{
-    if (aux->izq == NULL)return aux->get_dato();
-    return menor(aux->izq);
-}
-template <class T> void Arbol<T>::borrar(Nodo<T>*& p, T x)
-{
-    if (p == NULL) cout << "\n El dato NO esta\n\n";
-    else if ( x.getTiempo() > p->get_dato().getTiempo() ) borrar(p->der, x);
-    else if ( x.getTiempo() < p->get_dato().getTiempo() ) borrar(p->izq, x);
-    else {// lo encontre en el nodo p
-        q = p;
-        if (q->der == NULL) p = q->izq;// raiz<=raiz del subarbol izq
-        else if (q->izq == NULL) p = q->der;//raiz<=raiz del subarbol der
-        else bor(q->izq);//busca en el sub arbol izq
-        delete q;
-    }
-}
-template <class T> void Arbol<T>::bor(Nodo<T>*& d)
-{
-    if (d->der != NULL) bor(d->der);//busca el elemento mas a la derecha
-    else {
-        q->set_dato( d->get_dato() );
-        q = d;
-        d = d->izq;
-    }
-}
 
 
 
@@ -252,13 +128,8 @@ public:
             : nombreDelEvento(nombre), horaDeEjecucion(tiempo){};   //Constructor con parametros
     string nombreDelEvento;
     unsigned int horaDeEjecucion;
-    int getTiempo();
-
 };
 
-int Evento::getTiempo(){
-    return horaDeEjecucion;
-}
 
 
 
@@ -281,13 +152,13 @@ public:
     ~Reloj(){};
 
     void generarEventos();
-    Evento* getEventos();
+    Evento** getEventos();
 
 };
 
 void Reloj::generarEventos(){
 
-    unsigned int tiempo = 0;
+    unsigned int tiempo = intervaloRep;
     string nombre;
 
     if(aleatorio == true){
@@ -295,7 +166,7 @@ void Reloj::generarEventos(){
         for(int c = 0; c < 50; c++){
 
             nombre = nombreDeReloj + " Evento " + std::to_string(c + 1);
-            this->eventos[c] = new Evento(nombre, tiempo);
+            eventos[c] = new Evento(nombre, tiempo);
             tiempo += generarRnd(intervaloRep);
         }
 
@@ -304,15 +175,15 @@ void Reloj::generarEventos(){
         for(int c = 0; c < 50; c++){
 
             nombre = nombreDeReloj + " Evento " + std::to_string(c + 1);
-            this->eventos[c] = new Evento(nombre, tiempo);
+            eventos[c] = new Evento(nombre, tiempo);
             tiempo += intervaloRep;
         }
     }
 }
 
-Evento* Reloj::getEventos(){
+Evento** Reloj::getEventos(){
 
-    return this->eventos[50];
+    return eventos;
 }
 
 int Reloj::generarRnd(int max){
@@ -332,42 +203,82 @@ int Reloj::generarRnd(int max){
 class Planificador{
 
 protected:
-    Lista<Reloj>* relojes = new Lista<Reloj>(); //Guarda los relojes en una lista (necesario para regenrar)
-    void regenerar();                           //Vuelve a crear 50 eventos por cada reloj en el planificador
+    Lista<Reloj*>* relojes = new Lista<Reloj*>(); //Guarda los relojes en una lista (necesario para regenrar)
+    void regenerar();                             //Vuelve a crear 50 eventos por cada reloj en el planificador
 
 public:
     unsigned int eventosLanzados, comparaciones, contAux;
-    virtual void agregarReloj(Reloj* r) = 0;                  // Se debe sobrescribir en cada planificador
-    virtual Evento getProximoEvento() = 0;                   // Se debe sobrescribir en cada planificador
+    void agregarReloj(Reloj* r);
+    virtual void agregarEventos() = 0;           // Se debe sobrescribir en cada planificador
+    virtual Evento getProximoEvento() = 0;       // Se debe sobrescribir en cada planificador
     void run();
-
+    void imprimir(Evento ev);
 };
+
+// Carga el reloj en la lista de relojes y genera eventos para dicho reloj
+void Planificador::agregarReloj(Reloj* r){
+
+    // Se carga el reloj en la lista de relojes del Planificador
+    this->relojes->add(r);
+    // Genera 50 eventos por cada reloj que se agrega
+    r->generarEventos();
+}
 
 void Planificador::run(){
 
-    Evento ev = getProximoEvento();
-    //Ejecutar
-    cout << ev.horaDeEjecucion << ' ' << ev.nombreDelEvento << endl;
-    eventosLanzados++;
-    contAux++;
-    //TODO sleep de evento
+    // Se agregan los eventos cuando el programa comienza y despues de cada llamada a regenerar()
+    if(contAux == 0){
+        // Se agregan los eventos generados en la estructura del Planificador
+        agregarEventos();
+    }
 
     if(contAux == 500){
 
+        cout << "Se lanzaron 500 eventos !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+        cout << "Eventos lanzados en total: " << eventosLanzados << endl;
         regenerar();
         contAux = 0;
+        run();
+    }
+
+    Evento ev = getProximoEvento();
+    //Ejecutar evento
+    cout << ev.horaDeEjecucion << ' ' << ev.nombreDelEvento << endl;
+    // Guarda los eventos en el archivo de salida (si este archivo no existe, es creado)
+    imprimir(ev);
+    eventosLanzados++;
+    contAux++;
+}
+
+// Recorre la lista de relojes y genera eventos para cada reloj
+void Planificador::regenerar(){
+
+    Nodo<Reloj*>* nodoReloj = relojes->nodo();
+    // Volver a generar 50 eventos por reloj cargado en el planificador (lista de relojes)
+    while(!nodoReloj->es_vacio()){
+        nodoReloj->get_dato()->generarEventos();
+        nodoReloj = nodoReloj->get_next();
     }
 }
 
-void Planificador::regenerar(){
+void Planificador::imprimir(Evento ev) {
 
-    Nodo<Reloj>* NodoReloj = relojes->nodo();
-    // Vover a generar 50 eventos por reloj cargado en el planificador (lista de relojes)
-    while(!NodoReloj->es_vacio()){
-        NodoReloj->get_dato().generarEventos();
-        NodoReloj = NodoReloj->get_next();
+    ofstream archivo;
+    archivo.open("Planificacion.txt", ios::app);
+
+    if(archivo.fail()){
+        cout<<"No se pudo abrir el archivo de salida.";
+        exit(1);
+    }else{
+        time_t my_time = ev.horaDeEjecucion + time(nullptr);
+        struct tm * timeinfo;
+        char buffer [80];
+        timeinfo = localtime (&my_time);
+        strftime (buffer,80,"%m-%d-%G %H:%M:%S",timeinfo);
+
+        archivo << buffer << " " << ev.nombreDelEvento<<endl;
+        archivo.close();
     }
-
 }
 
 
@@ -382,31 +293,141 @@ class Planificador1 : public Planificador{
 private:
     Lista<Evento>* eventos = new Lista<Evento>();
     void ordenar();
+    void ordenaQS(int primero, int ultimo);
+    unsigned int getHoraDelEvento(int posicion);
+    void swapEventos(int posicionA, int posicionB);
 
 public:
-    void agregarReloj(Reloj* r) override ;
+    void agregarEventos() override ;
     Evento getProximoEvento() override ;
 
 };
 
+
 void Planificador1::ordenar(){
 
+    // Primero obtener la cantidad de Nodos en la lista de eventos
+    int nroDeEventos = 0;
+
+    Nodo<Evento>* nodoEvento = eventos->nodo();
+
+    while(!nodoEvento->es_vacio()){
+        nroDeEventos++;
+        nodoEvento = nodoEvento->get_next();
+    }
+    cout << "Numero de eventos en la lista: " << nroDeEventos << endl;
+
+    ordenaQS(0, nroDeEventos);
 }
 
-void Planificador1::agregarReloj(Reloj* r){
+// Implementacion del Algoritmo Quick Sort
+void Planificador1::ordenaQS(int primero, int ultimo){
 
-    // Se carga el reloj en la lista de relojes del Planificador
-    this->relojes->add(*r);  // Puntero a Reloj desreferenciado
-    // Genera 50 eventos por cada reloj que se agrega
-    r->generarEventos();
-    Evento* ArrDeEventos = r->getEventos();
+    int i,j,pivot;
 
-    for(int c = 0; c < 50; c++){
-        // Guarda los eventos en la lista del planificador donde seran ordenados y luego ejecutados
+    if(ultimo>primero){
 
-        // LINEA QUE CAUSA EL ERROR (No descomentar!!!)
-        // eventos->add(ArrDeEventos[c]);
+        pivot= getHoraDelEvento(ultimo);
+        i=primero-1;
+        j=ultimo;
 
+        for(;;){
+            while(getHoraDelEvento(++i) <pivot);
+            while(getHoraDelEvento(--j) >pivot);
+            if(i >= j) break;
+            swapEventos(i,j);
+        }
+        swapEventos(i, ultimo);
+
+        ordenaQS(primero,i-1);
+        ordenaQS(i+1,ultimo);
+    }
+}
+
+// Devuelve la hora de ejecucion del evento en la posicion especificada de la lista
+unsigned int Planificador1::getHoraDelEvento(int posicion){
+
+    Nodo<Evento>* nodoEvento = eventos->nodo();
+
+    for(int c = 0; c <= posicion; c++){
+
+        if(c == posicion){
+
+            return nodoEvento->get_dato().horaDeEjecucion;
+        }
+        nodoEvento = nodoEvento->get_next();
+    }
+    return 0;
+}
+
+// Intercambia los Nodos en las respectivas posiciones de la lista enlazada de eventos
+void Planificador1::swapEventos(int posicionA, int posicionB){
+
+        // Obtengo la posicion mas grande para determinar los ciclos del for
+        if (posicionA < posicionB) {
+
+            int temp = posicionA;
+            posicionA = posicionB;
+            posicionB = temp;
+        }
+
+    Nodo<Evento> *nodoEvento = eventos->nodo();
+
+    if(posicionA == posicionB || !nodoEvento || !nodoEvento->get_next())
+        return;
+
+    Nodo<Evento> *nodoA = nullptr;
+    Nodo<Evento> *nodoB = nullptr;
+    Nodo<Evento> *previoA = nullptr;
+    Nodo<Evento> *previoB = nullptr;
+
+    for(int x = 0; x <= posicionA; x++){
+
+        if(x == (posicionA - 1)){previoA = nodoEvento;}
+        if(x == posicionA){nodoA = nodoEvento;}
+        if(x == (posicionB - 1)){previoB = nodoEvento;}
+        if(x == posicionB){nodoB = nodoEvento;}
+
+        nodoEvento = nodoEvento->get_next();
+    }
+
+    if(!nodoA || !nodoB)
+        return;
+
+    if(previoA){
+        previoA->set_next(nodoB);
+    } else { // nodeA es la cabeza
+        eventos->czo = nodoB;
+    }
+
+    if(previoB){
+        previoB->set_next(nodoA);
+    } else { // nodeB es la cabeza
+        eventos->czo = nodoA;
+    }
+
+    Nodo<Evento> *tmp = nodoA->get_next();
+    nodoA->set_next(nodoB->get_next());
+    nodoB->set_next(tmp);
+}
+
+
+
+void Planificador1::agregarEventos(){
+
+    Nodo<Reloj*>* nodoReloj = relojes->nodo();
+
+    while(!nodoReloj->es_vacio()){
+
+        // Arreglo de punteros a objetos Evento
+        Evento** ArrDeEventos = nodoReloj->get_dato()->getEventos();
+
+        for(int x = 0; x < 50; x++){
+
+            // Guarda los eventos en la lista del planificador donde seran ordenados y luego ejecutados
+            eventos->add(*ArrDeEventos[x]);
+        }
+        nodoReloj = nodoReloj->get_next();
     }
     ordenar();
 }
@@ -419,47 +440,6 @@ Evento Planificador1::getProximoEvento(){
     return  ev;
 }
 
-//-------------------------------------------------------------------------------------------
-//  PLANIFICADOR 1 (lista enlazada)
-
-class Planificador2 : public Planificador{
-
-private:
-    Arbol<Evento>* eventos = new Arbol<Evento>();
-    void ordenar();
-
-public:
-    void agregarReloj(Reloj* r) override ;
-    Evento getProximoEvento() override ;
-
-};
-
-void Planificador2::ordenar(){
-
-}
-
-void Planificador2::agregarReloj(Reloj* r){
-
-    // Se carga el reloj en la lista de relojes del Planificador
-    this->relojes->add(*r);  // Puntero a Reloj desreferenciado
-    // Genera 50 eventos por cada reloj que se agrega
-    r->generarEventos();
-    Evento* ArrDeEventos = r->getEventos();
-
-    for(int c = 0; c < 50; c++){
-        // Guarda los eventos en la lista del planificador donde seran ordenados y luego ejecutados
-        eventos->creaArbolBus(ArrDeEventos[c]);
-    }
-    //ordenar();
-}
-
-Evento Planificador2::getProximoEvento(){
-
-    Evento ev = eventos->menor();
-    eventos->borrar(ev);
-
-    return  ev;
-}
 
 
 
@@ -509,14 +489,22 @@ int main(){
     archivo.open("relojes.txt");
 
     // Inicializar planificadores
-    //Planificador1* p1 = new Planificador1();
-    Planificador2* p2 = new Planificador2();
+    Planificador1* p1 = new Planificador1();
 
     if(archivo.is_open()){
-        cargarRelojes(p2, archivo);
+
+        cout << "**************** Relojes Cargados ******************" << endl;
+
+        cargarRelojes(p1, archivo);
         archivo.close();
 
-        p2->run();
+        cout << "**************** Eventos Lanzados ******************" << endl;
+
+        int c = 0;
+        while(c<=2000) {
+            p1->run();
+            c++;
+        }
     }
     else{
         cout << "El archivo no pudo ser abierto.";
@@ -530,8 +518,7 @@ int main(){
 
 /*
  *     PROBLEMAS:
- *     1) El ultimo reloj en el archivo relojes.txt se esta cargando dos veces. Aparentemente el problema
- *     es el metodo eof() que se usa para detectar el final del archivo (linea 311).
- *     2) El Planificador 1 tiene un problema al cargar los eventos en la lista en la que seran ordenados.
- *        Esto esta generando el "segmentation fault". Ignorar la clase Planificador1 hasta que no se solucione.
+ *     1) Imprime un cero entre los primeros 500 eventos.
+ *     2) Darle formato al tiempo de los eventos (No es la prioridad en este momento)
+ *
  */
