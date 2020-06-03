@@ -425,7 +425,7 @@ Evento Planificador1::getProximoEvento(){
 class Planificador2 : public Planificador{
 
 private:
-    Arbol<Evento>* eventos = new Arbol<Evento>();
+    Evento* arrDeEventos = new Evento[100];
     void ordenar();
 
 public:
@@ -435,7 +435,7 @@ public:
 };
 
 void Planificador2::ordenar(){
-
+    std::cout << "ordenar" << '\n';
 }
 
 void Planificador2::agregarReloj(Reloj* r){
@@ -444,21 +444,21 @@ void Planificador2::agregarReloj(Reloj* r){
     this->relojes->add(*r);  // Puntero a Reloj desreferenciado
     // Genera 50 eventos por cada reloj que se agrega
     r->generarEventos();
-    Evento* ArrDeEventos = r->getEventos();
-
+    arrDeEventos = r->getEventos();
+    std::cout << "runrun" << '\n';
     for(int c = 0; c < 50; c++){
-        // Guarda los eventos en la lista del planificador donde seran ordenados y luego ejecutados
-        eventos->creaArbolBus(ArrDeEventos[c]);
+        cout << arrDeEventos[c].getTiempo() << '\n';
+        std::cout << "for" << '\n';
     }
-    //ordenar();
+    ordenar();
 }
 
 Evento Planificador2::getProximoEvento(){
 
-    Evento ev = eventos->menor();
-    eventos->borrar(ev);
+    //Evento ev = eventos->menor();
+    //eventos->borrar(ev);
 
-    return  ev;
+    return  arrDeEventos[0];
 }
 
 
