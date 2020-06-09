@@ -441,9 +441,6 @@ Evento Planificador1::getProximoEvento(){
 }
 
 
-
-
-
 //-------------------------------------------------------------------------------------------
 //  Funciones
 
@@ -489,20 +486,20 @@ int main(){
     archivo.open("relojes.txt");
 
     // Inicializar planificadores
-    Planificador1* p1 = new Planificador1();
+    Planificador3* p3 = new Planificador3();
 
     if(archivo.is_open()){
 
         cout << "**************** Relojes Cargados ******************" << endl;
 
-        cargarRelojes(p1, archivo);
+        cargarRelojes(p3, archivo);
         archivo.close();
 
         cout << "**************** Eventos Lanzados ******************" << endl;
 
         int c = 0;
         while(c<=2000) {
-            p1->run();
+            p3->run();
             c++;
         }
     }
