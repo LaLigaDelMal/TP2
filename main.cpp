@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include <string>
+#include <string.h>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -94,7 +94,7 @@ template <class T> bool Lista<T>::es_vacia(){
 template <class T> T Lista<T>::cabeza(){
     if (es_vacia()) {
 
-       // return NULL;
+        // return NULL;
     }
     return czo->get_dato();
 }
@@ -112,8 +112,6 @@ template <class T> Nodo<T>* Lista<T>::nodo() {
 
     return czo;
 }
-
-
 
 
 
@@ -139,16 +137,16 @@ public:
 class Reloj {
 
 private:
-    int numeroDeReloj, intervaloRep;
+    int numeroDeReloj, intervaloRep, nroEvento, timeStamp;
     string nombreDeReloj;
     bool aleatorio = false;
-    Evento* eventos[50];      // Arreglo de punteros a eventos
+    Evento* eventos[50];
     int generarRnd(int max);
 
 public:
     Reloj(){};
     Reloj(int numRel, int tieRep, string nomRel, bool al)
-    : numeroDeReloj(numRel), intervaloRep(tieRep), nombreDeReloj(nomRel), aleatorio(al){};
+            : numeroDeReloj(numRel), intervaloRep(tieRep), nombreDeReloj(nomRel), aleatorio(al){};
     ~Reloj(){};
 
     void generarEventos();
@@ -158,27 +156,31 @@ public:
 
 void Reloj::generarEventos(){
 
-    unsigned int tiempo = 0;
+    unsigned int tiempo = timeStamp;
+
     string nombre;
 
     if(aleatorio == true){
 
         for(int c = 0; c < 50; c++){
 
-            nombre = nombreDeReloj + " Evento " + std::to_string(c + 1);
-            eventos[c] = new Evento(nombre, tiempo);
+            nroEvento++;
             tiempo += generarRnd(intervaloRep);
+            nombre = nombreDeReloj + " Evento " + std::to_string(nroEvento);
+            eventos[c] = new Evento(nombre, tiempo);
         }
 
     }else{
 
         for(int c = 0; c < 50; c++){
 
-            nombre = nombreDeReloj + " Evento " + std::to_string(c + 1);
-            eventos[c] = new Evento(nombre, tiempo);
+            nroEvento++;
             tiempo += intervaloRep;
+            nombre = nombreDeReloj + " Evento " + std::to_string(nroEvento);
+            eventos[c] = new Evento(nombre, tiempo);
         }
     }
+    timeStamp = tiempo;
 }
 
 Evento** Reloj::getEventos(){
@@ -189,7 +191,9 @@ Evento** Reloj::getEventos(){
 int Reloj::generarRnd(int max){
 
     srand((unsigned) time(0));
-    return (rand() % max);
+    int rnd = (rand() % max);
+    if (rnd == 0) return 1;   // No se aceptan valores iguales a cero
+    return rnd;
 }
 
 
@@ -203,15 +207,16 @@ int Reloj::generarRnd(int max){
 class Planificador{
 
 protected:
-    Lista<Reloj*>* relojes = new Lista<Reloj*>(); //Guarda los relojes en una lista (necesario para regenrar)
+    Lista<Reloj*>* relojes = new Lista<Reloj*>(); //Guarda los punteros a relojes en una lista (necesario para regenrar)
     void regenerar();                             //Vuelve a crear 50 eventos por cada reloj en el planificador
 
 public:
     unsigned int eventosLanzados, comparaciones, contAux;
     void agregarReloj(Reloj* r);
-    virtual void agregarEventos() = 0;           // Se debe sobrescribir en cada planificador
-    virtual Evento getProximoEvento() = 0;       // Se debe sobrescribir en cada planificador
+    virtual void agregarEventos() = 0;           // Funcion virtual pura
+    virtual Evento getProximoEvento() = 0;       // Funcion virtual pura
     void run();
+    void imprimir(Evento ev);
 };
 
 // Carga el reloj en la lista de relojes y genera eventos para dicho reloj
@@ -241,8 +246,12 @@ void Planificador::run(){
     }
 
     Evento ev = getProximoEvento();
-    //Ejecutar
-    cout << ev.horaDeEjecucion << ' ' << ev.nombreDelEvento << endl;
+
+    //Ejecutar evento
+    // cout << ev.horaDeEjecucion << ' ' << ev.nombreDelEvento << endl;
+
+    // Guarda los eventos en el archivo de salida (si este archivo no existe, es creado)
+    imprimir(ev);
     eventosLanzados++;
     contAux++;
 }
@@ -255,6 +264,26 @@ void Planificador::regenerar(){
     while(!nodoReloj->es_vacio()){
         nodoReloj->get_dato()->generarEventos();
         nodoReloj = nodoReloj->get_next();
+    }
+}
+
+void Planificador::imprimir(Evento ev) {
+
+    ofstream archivo;
+    archivo.open("Planificacion.txt", ios::app);
+
+    if(archivo.fail()){
+        cout<<"No se pudo abrir el archivo de salida.";
+        exit(1);
+    }else{
+        time_t tiempo = ev.horaDeEjecucion + time(nullptr);
+        struct tm * info;
+        char buffer [80];
+        info = localtime (&tiempo);
+        strftime (buffer,80,"%m-%d-%G %H:%M:%S",info);
+
+        archivo << buffer << " " << ev.nombreDelEvento<<endl;
+        archivo.close();
     }
 }
 
@@ -292,7 +321,7 @@ void Planificador1::ordenar(){
         nroDeEventos++;
         nodoEvento = nodoEvento->get_next();
     }
-    cout << "Numero de eventos en la lista: " << nroDeEventos << endl;
+  //  cout << "Numero de eventos en la lista: " << nroDeEventos << endl;
 
     ordenaQS(0, nroDeEventos);
 }
@@ -311,6 +340,7 @@ void Planificador1::ordenaQS(int primero, int ultimo){
         for(;;){
             while(getHoraDelEvento(++i) <pivot);
             while(getHoraDelEvento(--j) >pivot);
+            comparaciones++;
             if(i >= j) break;
             swapEventos(i,j);
         }
@@ -340,13 +370,13 @@ unsigned int Planificador1::getHoraDelEvento(int posicion){
 // Intercambia los Nodos en las respectivas posiciones de la lista enlazada de eventos
 void Planificador1::swapEventos(int posicionA, int posicionB){
 
-        // Obtengo la posicion mas grande para determinar los ciclos del for
-        if (posicionA < posicionB) {
+    // Obtengo la posicion mas grande para determinar los ciclos del for
+    if (posicionA < posicionB) {
 
-            int temp = posicionA;
-            posicionA = posicionB;
-            posicionB = temp;
-        }
+        int temp = posicionA;
+        posicionA = posicionB;
+        posicionB = temp;
+    }
 
     Nodo<Evento> *nodoEvento = eventos->nodo();
 
@@ -373,13 +403,13 @@ void Planificador1::swapEventos(int posicionA, int posicionB){
 
     if(previoA){
         previoA->set_next(nodoB);
-    } else { // nodeA is head
+    } else { // nodeA es la cabeza
         eventos->czo = nodoB;
     }
 
     if(previoB){
         previoB->set_next(nodoA);
-    } else { // nodeB is head
+    } else { // nodeB es la cabeza
         eventos->czo = nodoA;
     }
 
@@ -389,20 +419,22 @@ void Planificador1::swapEventos(int posicionA, int posicionB){
 }
 
 
-
+// Se agregan los eventos generados en la lista y luego se ordenan
 void Planificador1::agregarEventos(){
 
+    // Se inicializa nodoReloj con el puntero al comienzo de la lista
     Nodo<Reloj*>* nodoReloj = relojes->nodo();
 
+    // Se recorre la lista de relojes y se le extraen los eventos a cada uno
     while(!nodoReloj->es_vacio()){
 
         // Arreglo de punteros a objetos Evento
-        Evento** ArrDeEventos = nodoReloj->get_dato()->getEventos();
+        Evento** temp = nodoReloj->get_dato()->getEventos();
 
         for(int x = 0; x < 50; x++){
 
             // Guarda los eventos en la lista del planificador donde seran ordenados y luego ejecutados
-            eventos->add(*ArrDeEventos[x]);
+            eventos->add(*temp[x]);
         }
         nodoReloj = nodoReloj->get_next();
     }
@@ -419,6 +451,123 @@ Evento Planificador1::getProximoEvento(){
 
 
 
+
+//-------------------------------------------------------------------------------------------
+//  PLANIFICADOR 2 (cola de prioridad)
+
+class Planificador2 : public Planificador{
+
+private:
+    Evento** HeapEventos;       // Puntero a un array de punteros a eventos
+    unsigned int nroDeEventos = 0;       // Contador de eventos en la heap
+    void ordenar();
+
+public:
+    void agregarEventos() override;
+    Evento getProximoEvento() override;
+};
+
+
+void Planificador2::ordenar() {
+
+    if(nroDeEventos==0) return; // heap esta vacio?
+    Evento* temp;
+    unsigned int n = nroDeEventos, parent = nroDeEventos/2, index, child; //indices del heap
+
+    while (1) { // while hasta que este ordenado
+        if (parent > 0) {
+            // primera etapa - ordenar el heap
+            temp = HeapEventos[--parent];  // valor temporario
+
+        } else {
+            // segunda etapa - extraer elementos
+            n--;
+            if (n == 0) return;
+            temp = HeapEventos[n];
+            HeapEventos[n] = HeapEventos[0];
+        }
+
+        // insercion
+        index = parent; // inicio con el padre
+        child = index * 2 + 1; // hijo izquierdo
+
+        while (child < n) {
+            comparaciones++;// busco el hijo mayor
+            if (child + 1 < n  &&  (HeapEventos[child + 1]->horaDeEjecucion) > (HeapEventos[child]->horaDeEjecucion)) {
+                child++; // mayor hijo es el derecho
+            }
+            comparaciones++;// el hijo es > temporario
+            if ((HeapEventos[child]->horaDeEjecucion) > (temp->horaDeEjecucion)){
+                HeapEventos[index] = HeapEventos[child]; // sobreescribo con el hijo
+
+                index = child; // muevo index
+                child = index * 2 + 1; // recalculo hijo izq
+            } else break; // encontro el lugar para temporario
+        }
+        HeapEventos[index] = temp;
+    }
+}
+
+
+void Planificador2::agregarEventos() {
+
+    // Se cuenta la cantidad de relojes para determinar la cantidad de eventos
+    Nodo<Reloj*>* nodoReloj = relojes->nodo();
+    unsigned int nroDeRelojes = 0;
+
+    while(!nodoReloj->es_vacio()){
+
+        nroDeRelojes++;
+        nodoReloj = nodoReloj->get_next();
+    }
+   // cout << "Numero de relojes cargados: " << nroDeRelojes << endl;
+
+
+
+    Evento** aux = new Evento*[nroDeEventos + (50 * nroDeRelojes)];
+
+    // Se copian los elementos de la heap en el arreglo auxiliar de mayor tamaño
+    for(int y = 0; y < nroDeEventos; y++){
+
+        aux[y] = HeapEventos[y];
+    }
+
+    nodoReloj = relojes->nodo();
+
+    while(!nodoReloj->es_vacio()) {
+
+        Evento** temp = nodoReloj->get_dato()->getEventos();
+
+        for (int x = 0; x < 50; x++) {
+
+            aux[x + nroDeEventos] = temp[x];
+        }
+        nroDeEventos += 50;
+        nodoReloj = nodoReloj->get_next();
+    }
+
+    HeapEventos = aux;
+
+    ordenar();
+}
+
+
+Evento Planificador2::getProximoEvento() {
+
+    // Se eliminar el primer elemento y se desplaza todo el arreglo
+    Evento* ev = HeapEventos[0];
+
+    // Shift
+    Evento** aux = new Evento*[nroDeEventos - 1];
+    for (int i = 1; i < nroDeEventos; ++i) {
+
+        aux[i - 1] = HeapEventos[i];
+    }
+    nroDeEventos--;
+    HeapEventos = aux;
+
+    return *ev;
+}
 
 
 //-------------------------------------------------------------------------------------------
@@ -449,7 +598,7 @@ void cargarRelojes(Planificador *p, ifstream &archivo){
 
         iss >> tiempoDeRepeticion;
 
-        cout << numeroDeReloj << " " << tiempoDeRepeticion << " " << nombreDeReloj << " " << aleatorio << endl;
+     //   cout << numeroDeReloj << " " << tiempoDeRepeticion << " " << nombreDeReloj << " " << aleatorio << endl;
         p->agregarReloj(new Reloj(numeroDeReloj, tiempoDeRepeticion, nombreDeReloj, aleatorio));
     }
 
@@ -467,21 +616,41 @@ int main(){
 
     // Inicializar planificadores
     Planificador1* p1 = new Planificador1();
+    Planificador2* p2 = new Planificador2();
 
     if(archivo.is_open()){
 
-        cout << "**************** Relojes Cargados ******************" << endl;
+      //  cout << "**************** Relojes Cargados ******************" << endl;
 
         cargarRelojes(p1, archivo);
+
+        archivo.clear();
+        archivo.seekg(0, std::ios::beg);
+
+        cargarRelojes(p2, archivo);
+
         archivo.close();
 
-        cout << "**************** Eventos Lanzados ******************" << endl;
+
+        cout << "**************** Eventos Lanzados (Planificador 1) ******************" << endl;
 
         int c = 0;
-        while(c<=2000) {
+        while(c<=2000) {     // Puse 2000 solo para probar
             p1->run();
             c++;
         }
+
+        cout << "**************** Eventos Lanzados (Planificador 2) ******************" << endl;
+
+        int x = 0;
+        while(x<=2000) {
+            p2->run();
+            x++;
+        }
+
+
+        cout << "Numero de comparaciones del Planificador 1 (QS): " << p1->comparaciones << endl;
+        cout << "Numero de comparaciones del Planificador 2 (Heap): " << p2->comparaciones << endl;
     }
     else{
         cout << "El archivo no pudo ser abierto.";
@@ -490,12 +659,3 @@ int main(){
 
     return 0;
 }
-
-
-
-/*
- *     PROBLEMAS:
- *     1) Imprime un cero entre los primeros 500 eventos.
- *     2) Darle formato al tiempo de los eventos (No es la prioridad en este momento)
- *
- */
