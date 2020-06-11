@@ -10,15 +10,12 @@
 #include <string.h>
 #include <fstream>
 #include <sstream>
-<<<<<<< HEAD
+
 #include <algorithm>
 #include <signal.h>
-=======
 #include <queue>
 #include <stack>
 #include <cmath>
-
->>>>>>> 6f9bc6149474a6addbe00a41eadf9762df9a5019
 
 using namespace std;
 
@@ -839,9 +836,6 @@ Evento Planificador2::getProximoEvento() {
 }
 
 
-<<<<<<< HEAD
-//-----------------------------------------------------------------------------------------
-=======
 
 //-------------------------------------------------------------------------------------------
 //  PLANIFICADOR 3 (Heap Binomial)
@@ -883,7 +877,6 @@ Evento Planificador3::getProximoEvento() {
 }
 
 //-------------------------------------------------------------------------------------------
->>>>>>> 6f9bc6149474a6addbe00a41eadf9762df9a5019
 //  Funciones
 
 // Lee el archivo, crea los relojes y los carga en el planificador
@@ -946,11 +939,7 @@ int main(){
     // Inicializar planificadores
     Planificador1* p1 = new Planificador1();
     Planificador2* p2 = new Planificador2();
-<<<<<<< HEAD
-    //Planificador3* p3 = new Planificador3();
-=======
     Planificador3* p3 = new Planificador3();
->>>>>>> 6f9bc6149474a6addbe00a41eadf9762df9a5019
 
     if(archivo.is_open()){
 
@@ -966,7 +955,6 @@ int main(){
         archivo.clear();
         archivo.seekg(0, std::ios::beg);
 
-<<<<<<< HEAD
         int aa;
         cout << "==============================================================================================" <<'\n'<< endl;
         std::cout << " Name        : Parcial 2" << '\n';
@@ -996,49 +984,15 @@ int main(){
                     COMP2=p2->comparaciones;
                 }
 
-            case 2:
+            case 3:
                 cout << '\n' << "**************** Eventos Lanzados (Planificador 3) ******************" << '\n' << endl;
                 signal(SIGINT, signal_callback_handler);
                 while(true) {
-                    //p3->run();
-                    //COMP3=p3->comparaciones;
+                    p3->run();
+                    COMP3=p3->comparaciones;
                 }
             }
 
-=======
-        cargarRelojes(p3, archivo);
-
-        archivo.close();
-/*
-
-        cout << "**************** Eventos Lanzados (Planificador 1) ******************" << endl;
-
-        int c = 0;
-        while(c<=2000) {     // Puse 2000 solo para probar
-            p1->run();
-            c++;
-        }
-
-        cout << "**************** Eventos Lanzados (Planificador 2) ******************" << endl;
-
-        int x = 0;
-        while(x<=2000) {
-            p2->run();
-            x++;
-        }
-*/
-        cout << "**************** Eventos Lanzados (Planificador 3) ******************" << endl;
-
-        int y = 0;
-        while(y<=2000) {
-            p3->run();
-            y++;
-        }
-
-
-        cout << "Numero de comparaciones del Planificador 1 (QS): " << p1->comparaciones << endl;
-        cout << "Numero de comparaciones del Planificador 2 (Heap): " << p2->comparaciones << endl;
->>>>>>> 6f9bc6149474a6addbe00a41eadf9762df9a5019
     }
     else{
         cout << "El archivo no pudo ser abierto.";
