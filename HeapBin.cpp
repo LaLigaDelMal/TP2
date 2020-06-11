@@ -4,15 +4,6 @@
 #include <stack>
 using namespace std;
 
-/*struct Node {
-	int info; // contains the key
-	int grado; // número de hijos
-	Node *p; // pointer to parent
-	Node *hijo; // pointer to the leftmost child
-	Node *hermano; // pointer to the right sibling
-};
-typedef Node *NodePtr;*/
-
 template <class T> class Nodo {
 public:
     T info, grado;
@@ -22,7 +13,6 @@ public:
 };
 
 
-// Class that represents Binomial heap data structure
 template <class T> class BinomialHeap {
 private:
 	Nodo<T>* raiz;				// apunta a la raíz del árbol binomial más a la izquierda
@@ -67,8 +57,7 @@ public:
 	}*/
 
 
-	// create sample heap (given in figure 5) with three trees for testing
-	void createSampleHeap() {
+	void creoHeap() {
 		// B0
 		Nodo<T>* node1 = new Nodo<T>;
 		inicioNodo(node1, 0, 0);
@@ -122,7 +111,7 @@ public:
 	}
 
 
-	//fusiona dos heap binarias del mismo grado H y H' = H
+	//fusiona dos heap binomial del mismo grado H y H' = H
 	void merge(BinomialHeap h1) {
 		Nodo<T>* curr1 = getRaiz();
 		Nodo<T>* curr2 = h1.getRaiz();
@@ -139,69 +128,7 @@ public:
 
 		temp = curr3;
 
-		// 1- fusiona dos montones sin cuidar los árboles con el mismo grado
-		//    las raíces del árbol deben estar en orden ascendente de grado de izquierda a derecha
-		while(curr1 != NULL && curr2 != NULL) {
-			if (curr1->grado <= curr2->grado) {
-				curr3->hermano = curr1;
-				curr1 = curr1->hermano;
-			} else {
-				curr3->hermano = curr2;
-				curr2 = curr2->hermano;
-			}
-			curr3 = curr3->hermano;
-		}
 
-		// copia todos los árboles restantes de heap1
-		if (curr1 != NULL) {
-			while(curr1 != NULL) {
-				curr3->hermano = curr1;
-				curr1 = curr1->hermano;
-				curr3 = curr3->hermano;
-			}
-		}
-
-		// copia todos los árboles restantes de heap2
-		if (curr2 != NULL) {
-			while(curr2 != NULL) {
-				curr3->hermano = curr2;
-				curr2 = curr2->hermano;
-				curr3 = curr3->hermano;
-			}
-		}
-
-    // 2- combina repetidamente árboles binarios con el mismo grado
-		curr3 = temp;
-		Nodo<T>* prev = NULL;
-		Nodo<T>* next = curr3->hermano;
-
-		while (next != NULL) {
-			// si dos raíces de árboles adyacentes tienen un grado diferente o 3 raíces consecutivas tienen el mismo grado
-			// pasar al siguiente árbol
-			if ((curr3->grado != next->grado )|| (next->hermano != NULL && curr3->grado == next->hermano->grado)) {
-				prev = curr3;
-				curr3 = next;
-			} else {
-				// de lo contrario, fusionar repetidamente árboles binomiales con el mismo grado
-				if (curr3->info <= next->info) {
-					curr3->hermano = next->hermano;
-					BinomialHeap::UnirArbolBinomial(curr3, next);
-				} else {
-					if (prev == NULL) {
-						temp = next;
-					} else {
-						prev->hermano = next;
-					}
-
-					BinomialHeap::UnirArbolBinomial(next, curr3);
-					curr3 = next;
-				}
-			}
-
-			next = curr3->hermano;
-		}
-
-		setRaiz(temp);
 	}
 
 /*	// deletes the smallest node from the heap
@@ -267,25 +194,6 @@ public:
 		return minPtr;
 	}
 	*/
-  int Display(Nodo<T>* H)
-  {
-      if (H == NULL)
-      {
-          cout<<"The Heap is empty"<<endl;
-          return 0;
-      }
-      cout<<"The root nodes are: "<<endl;
-      Nodo<T>* p;
-      p = H;
-      while (p != NULL)
-      {
-          cout<<p->info;
-          if (p->hermano != NULL)
-              cout<<"-->";
-          p = p->hermano;
-      }
-      cout<<endl;
-  }
 };
 
 
@@ -296,7 +204,7 @@ int main() {
 
   int vec[10] = { 50,12,18,240,222,45,410,325,38,95 };
 
-	heap1.createSampleHeap();
+	heap1.creoHeap();
 
 
   for (int i = 0; i < 10; i++) {
