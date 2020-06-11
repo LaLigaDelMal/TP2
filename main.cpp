@@ -1,3 +1,9 @@
+//==============================================================================================
+// Name        : tp2-master
+// Author      : Castellano Evangelina, Chagay Vera Adriel, Segura Gaspar, Wortley Agustina
+// Version     : 1
+// Description : Segundo parcial de algoritmos y estructuras de datos
+//==============================================================================================
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
@@ -5,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <signal.h>
 
 using namespace std;
 
@@ -196,11 +203,6 @@ int Reloj::generarRnd(int max){
     return rnd;
 }
 
-
-
-
-
-
 //-------------------------------------------------------------------------------------------
 //  PLANIFICADOR (clase abstracta)
 
@@ -281,8 +283,6 @@ void Planificador::imprimir(Evento ev) {
         char buffer [80];
         info = localtime (&tiempo);
         strftime (buffer,80,"%m-%d-%G %H:%M:%S",info);
-
-        archivo << buffer << " " << ev.nombreDelEvento<<endl;
         archivo.close();
     }
 }
@@ -496,7 +496,7 @@ void Planificador2::ordenar() {
             if (child + 1 < n  &&  (HeapEventos[child + 1]->horaDeEjecucion) > (HeapEventos[child]->horaDeEjecucion)) {
                 child++; // mayor hijo es el derecho
             }
-            comparaciones++;// el hijo es > temporario
+            //comparaciones++;// el hijo es > temporario
             if ((HeapEventos[child]->horaDeEjecucion) > (temp->horaDeEjecucion)){
                 HeapEventos[index] = HeapEventos[child]; // sobreescribo con el hijo
 
@@ -570,7 +570,7 @@ Evento Planificador2::getProximoEvento() {
 }
 
 
-//-------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------
 //  Funciones
 
 // Lee el archivo, crea los relojes y los carga en el planificador
@@ -604,7 +604,23 @@ void cargarRelojes(Planificador *p, ifstream &archivo){
 
 };
 
+//------------------------------------------------------------------------------
+//CTRL-C HANDLER
 
+int COMP1=0;  //Algunas mouske-variables globales que nos ayudaran mas tarde
+int COMP2=0;
+int COMP3=0;
+
+void signal_callback_handler(int signum) {
+    if(COMP2==0){
+        cout << "Numero de comparaciones del Planificador 1 (QS): " << COMP1 << endl;
+    }else if(COMP3==0){
+        cout << "Numero de comparaciones del Planificador 2 (Heap):  " << COMP2 << endl;
+    }else{
+        cout << "Numero de comparaciones del Planificador 3 (Heap Binomial):  " << COMP3 << endl;
+    }
+    exit(signum);
+}
 //-------------------------------------------------------------------------------------------
 //  MAIN
 
@@ -617,6 +633,7 @@ int main(){
     // Inicializar planificadores
     Planificador1* p1 = new Planificador1();
     Planificador2* p2 = new Planificador2();
+    //Planificador3* p3 = new Planificador3();
 
     if(archivo.is_open()){
 
@@ -631,26 +648,44 @@ int main(){
 
         archivo.close();
 
+        int aa;
+        cout << "==============================================================================================" <<'\n'<< endl;
+        std::cout << " Name        : Parcial 2" << '\n';
+        std::cout << " Author      : Segura Gaspar, Wortley Agustina, Castellano Evangelina, Chagay Vera Adriel" << '\n';
+        std::cout << " Version     : 1.0" << '\n';
+        std::cout << " Description : Segundo parcial de algoritmos y estructuras de datos" << '\n' <<'\n';
+        std::cout << "==============================================================================================" << '\n' << '\n';
 
-        cout << "**************** Eventos Lanzados (Planificador 1) ******************" << endl;
+        cout << "**************** Seleccionar Planificador ******************" << '\n' << endl;
+        cout << "1.- Planificador 1" << '\n' << "2.- Planificador 2" << '\n' << "3.- Planificador 3 (BETA)" << '\n' << '\n';
+        cout << "Seleccione una opcion: ";
+        cin >> aa;
+        switch (aa) {
+            case 1:
+                cout << '\n' << "**************** Eventos Lanzados (Planificador 1) ******************" << '\n' << endl;
+                signal(SIGINT, signal_callback_handler );
+                while(true) {
+                    p1->run();
+                    COMP1=p1->comparaciones;
+                }
 
-        int c = 0;
-        while(c<=2000) {     // Puse 2000 solo para probar
-            p1->run();
-            c++;
-        }
+            case 2:
+                cout << '\n' << "**************** Eventos Lanzados (Planificador 2) ******************" << '\n' << endl;
+                signal(SIGINT, signal_callback_handler);
+                while(true) {
+                    p2->run();
+                    COMP2=p2->comparaciones;
+                }
 
-        cout << "**************** Eventos Lanzados (Planificador 2) ******************" << endl;
+            case 2:
+                cout << '\n' << "**************** Eventos Lanzados (Planificador 3) ******************" << '\n' << endl;
+                signal(SIGINT, signal_callback_handler);
+                while(true) {
+                    //p3->run();
+                    //COMP3=p3->comparaciones;
+                }
+            }
 
-        int x = 0;
-        while(x<=2000) {
-            p2->run();
-            x++;
-        }
-
-
-        cout << "Numero de comparaciones del Planificador 1 (QS): " << p1->comparaciones << endl;
-        cout << "Numero de comparaciones del Planificador 2 (Heap): " << p2->comparaciones << endl;
     }
     else{
         cout << "El archivo no pudo ser abierto.";
